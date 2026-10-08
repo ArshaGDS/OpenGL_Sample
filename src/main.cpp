@@ -1,16 +1,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-int main(void)
+int main()
 {
-    GLFWwindow* window;
-
     /* Initialize the library */
     if (!glfwInit())
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
@@ -23,17 +21,25 @@ int main(void)
     if (glewInit() != GLEW_OK)
         return -1;
 
+    float vertices[6] = {
+        -0.5f, -0.5f,
+         0.0f, 0.5f,
+         0.5f, -0.5f
+    };
+
+    unsigned int buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBegin(GL_TRIANGLES);
-        glVertex2d(-0.5, -0.5);
-        glVertex2d(0.0f, 0.5);
-        glVertex2d(0.5, -0.5);
-        glEnd();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
