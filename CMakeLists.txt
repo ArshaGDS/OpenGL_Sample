@@ -15,4 +15,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR_BASE}/lib")
 
 add_subdirectory(dependencies)
 
+find_package(OpenGL REQUIRED)
+
 add_executable(OpenGL_Sample src/main.cpp)
+target_link_libraries(OpenGL_Sample PRIVATE glfw)
+target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL)
