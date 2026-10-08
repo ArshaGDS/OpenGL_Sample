@@ -5,6 +5,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_package(OpenGL REQUIRED)
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS "CMake")
 
@@ -15,8 +17,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR_BASE}/lib")
 
 add_subdirectory(dependencies)
 
-find_package(OpenGL REQUIRED)
-
 add_executable(OpenGL_Sample src/main.cpp)
-target_link_libraries(OpenGL_Sample PRIVATE glfw)
-target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL)
+
+target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s)
+
+target_include_directories(OpenGL_Sample PRIVATE
+        "${PROJECT_SOURCE_DIR}/dependencies/glew-2.3.1/include"
+)
