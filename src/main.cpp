@@ -1,13 +1,73 @@
+#include <cstring>
 #include <iostream>
 #include <ostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <fstream>
+#include <filesystem>
+#include <sstream>
 
-static unsigned int CompileShader(const unsigned int type, const std::string & source)
+struct ShaderProgramSources
 {
-    const unsigned int id = glCreateShader(type);
+    std::string VertexSource;
+    std::string FragmentSource;
+};
+
+namespace
+{
+    enum class ShaderType: int8_t
+    {
+        NONE = -1,
+        VERTEX = 0,
+        FRAGMENT = 1
+    };
+}
+
+static ShaderProgramSources ParseShader(const std::string& filePath)
+{
+    std::ifstream ifs(filePath);
+    if (!ifs.is_open())
+    {
+        std::cerr << "Failed to open shader file: " << filePath << "\n";
+        std::cerr << "Reason: " << std::strerror(errno) << "\n";
+        std::cerr << "Current working directory: " << std::filesystem::current_path() << std::endl;
+        return {};
+    }
+
+    std::string line;
+    std::stringstream sstr[2];
+    ShaderType shaderType = ShaderType::NONE;
+
+    while (std::getline(ifs, line))
+    {
+        if (line.find("#shader") != std::string::npos)
+        {
+            if (line.find("vertex") != std::string::npos)
+            {
+                shaderType = ShaderType::VERTEX;
+            }
+            else if (line.find("fragment") != std::string::npos)
+            {
+                shaderType = ShaderType::FRAGMENT;
+            }
+        }
+        else if (shaderType != ShaderType::NONE) // Prevent writing to sstr[-1]
+        {
+            sstr[(int)shaderType] << line << '\n';
+        }
+    }
+
+    return {
+        .VertexSource = sstr[0].str(),
+        .FragmentSource = sstr[1].str()
+    };
+}
+
+static uint32_t CompileShader(const unsigned int type, const std::string & source)
+{
+    const uint32_t id = glCreateShader(type);
     const char* src = source.c_str();
 
     glShaderSource(id, 1, &src, nullptr);
@@ -28,11 +88,11 @@ static unsigned int CompileShader(const unsigned int type, const std::string & s
     return id;
 }
 
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
+static uint32_t CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
-    const unsigned int program = glCreateProgram();
-    const unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    const unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+    const uint32_t program = glCreateProgram();
+    const uint32_t vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    const uint32_t fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
     glAttachShader(program, vs);
     glAttachShader(program, fs);
@@ -72,7 +132,7 @@ int main()
          0.5f, -0.5f
     };
 
-    unsigned int bufferId;
+    uint32_t bufferId;
     glGenBuffers(1, &bufferId);
     glBindBuffer(GL_ARRAY_BUFFER, bufferId);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -80,23 +140,15 @@ int main()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
 
-    const std::string vertexShader =
-        R"(#version 330 core
-         layout(location = 0) in vec4 position;
-         void main()
-         {
-            gl_Position = position;
-         })";
 
-    const std::string fragmentShader =
-     R"(#version 330 core
-      layout(location = 0) out vec4 color;
-      void main()
-      {
-         color = vec4(1.0, 0.0, 1.0, 1.0);
-      })";
+    ShaderProgramSources shaderSources = ParseShader("/home/arsha/Dev/OpenGL_Sample/res/shaders/basic.shader");
 
-    const unsigned int shader = CreateShader(vertexShader, fragmentShader);
+    std::cout << "Vertex" << std::endl;
+    std::cout << shaderSources.VertexSource << std::endl;
+    std::cout << "Fragment" << std::endl;
+    std::cout << shaderSources.FragmentSource << std::endl;
+
+    const uint32_t shader = CreateShader(shaderSources.VertexSource, shaderSources.FragmentSource);
     glUseProgram(shader);
 
     /* Loop until the user closes the window */
