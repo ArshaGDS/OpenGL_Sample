@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <sstream>
 
+namespace fs = std::filesystem;
+
 struct ShaderProgramSources
 {
     std::string VertexSource;
@@ -25,7 +27,7 @@ namespace
     };
 }
 
-static ShaderProgramSources ParseShader(const std::string& filePath)
+static ShaderProgramSources ParseShader(const fs::path& filePath)
 {
     std::ifstream ifs(filePath);
     if (!ifs.is_open())
@@ -105,6 +107,19 @@ static uint32_t CreateShader(const std::string& vertexShader, const std::string&
     return program;
 }
 
+static fs::path FindResource(const fs::path& relative)
+{
+    fs::path dir = fs::current_path();
+    while (true)
+    {
+        fs::path candidate = dir / relative;
+        if (fs::exists(candidate))
+            return candidate;
+        if (!dir.has_parent_path() || dir == dir.parent_path())
+            return {};
+        dir = dir.parent_path();
+    }
+}
 
 int main()
 {
@@ -141,7 +156,7 @@ int main()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
 
 
-    ShaderProgramSources shaderSources = ParseShader("/home/arsha/Dev/OpenGL_Sample/res/shaders/basic.shader");
+    ShaderProgramSources shaderSources = ParseShader(FindResource("res/shaders/basic.shader"));
 
     std::cout << "Vertex" << std::endl;
     std::cout << shaderSources.VertexSource << std::endl;
