@@ -9,7 +9,27 @@
 #include <filesystem>
 #include <sstream>
 
+#define ASSERT(x) if (!(x)) __debugbreak(); // Its just works in MSVC compiler and Windows OS
+#define GLCall(x) GLClearError();\
+    x;\
+    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+
 namespace fs = std::filesystem;
+
+static void GLClearError()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLogCall(const char* function, const char* file, int line)
+{
+    while (const GLenum error = glGetError())
+    {
+        std::cerr << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << std::endl;
+        return false;
+    }
+    return true;
+}
 
 struct ShaderProgramSources
 {
@@ -177,8 +197,7 @@ int main()
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr))
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
