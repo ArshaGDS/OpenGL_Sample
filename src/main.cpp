@@ -158,6 +158,8 @@ int main()
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
+    glfwSwapInterval(1);
+
     if (glewInit() != GLEW_OK)
         return -1;
 
@@ -191,13 +193,27 @@ int main()
     const uint32_t shader = CreateShader(shaderSources.VertexSource, shaderSources.FragmentSource);
     glUseProgram(shader);
 
+    int32_t location = glGetUniformLocation(shader, "u_Color");
+    ASSERT(location != -1);
+
+    float redChanel = 0.0f;
+    float increment = 0.05;
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        GLCall(glUniform4f(location, redChanel, 0.3f, 0.8f, 0.1f));
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr))
+
+        if (redChanel > 1.0f)
+            increment = -0.05f;
+        else if (redChanel < 0.0f)
+            increment = 0.05f;
+
+        redChanel += increment;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
