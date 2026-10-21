@@ -60,7 +60,7 @@ static ShaderProgramSources ParseShader(const fs::path& filePath)
 
     std::string line;
     std::stringstream sstr[2];
-    ShaderType shaderType = ShaderType::NONE;
+    auto shaderType = ShaderType::NONE;
 
     while (std::getline(ifs, line))
     {
@@ -92,17 +92,17 @@ static uint32_t CompileShader(const unsigned int type, const std::string & sourc
     const uint32_t id = glCreateShader(type);
     const char* src = source.c_str();
 
-    glShaderSource(id, 1, &src, nullptr);
-    glCompileShader(id);
+    GLCall(glShaderSource(id, 1, &src, nullptr));
+    GLCall(glCompileShader(id));
 
     int result;
-    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    GLCall(glGetShaderiv(id, GL_COMPILE_STATUS, &result));
     if (result == GL_FALSE)
     {
         int length;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        GLCall(glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length));
         auto message = std::string(length, '\0');
-        glGetShaderInfoLog(id, length, &length, &message[0]);
+        GLCall(glGetShaderInfoLog(id, length, &length, &message[0]));
         std::cout << "Failed to compile shader" << std::endl;
         std::cout << message << std::endl;
     }
@@ -116,13 +116,13 @@ static uint32_t CreateShader(const std::string& vertexShader, const std::string&
     const uint32_t vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
     const uint32_t fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
-    glAttachShader(program, vs);
-    glAttachShader(program, fs);
-    glLinkProgram(program);
-    glValidateProgram(program);
+    GLCall(glAttachShader(program, vs));
+    GLCall(glAttachShader(program, fs));
+    GLCall(glLinkProgram(program));
+    GLCall(glValidateProgram(program));
 
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    GLCall(glDeleteShader(vs));
+    GLCall(glDeleteShader(fs));
 
     return program;
 }
@@ -146,6 +146,10 @@ int main()
     /* Initialize the library */
     if (!glfwInit())
         return -1;
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
     GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World", nullptr, nullptr);
@@ -175,26 +179,35 @@ int main()
         2, 3, 0
     };
 
-    uint32_t bufferId;
-    glGenBuffers(1, &bufferId);
-    glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(positions), positions, GL_STATIC_DRAW);
+    uint32_t vao; // vertex array object
+    GLCall(glGenVertexArrays(1, &vao));
+    GLCall(glBindVertexArray(vao));
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+    uint32_t bufferId;
+    GLCall(glGenBuffers(1, &bufferId));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, bufferId));
+    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(positions) * 2 * sizeof(float), positions, GL_STATIC_DRAW));
+
+    GLCall(glEnableVertexAttribArray(0));
+    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr));
 
     uint32_t ibo; // index buffer object
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint32_t), indices, GL_STATIC_DRAW);
+    GLCall(glGenBuffers(1, &ibo));
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint32_t), indices, GL_STATIC_DRAW));
 
 
     const ShaderProgramSources shaderSources = ParseShader(FindResource("res/shaders/basic.shader"));
     const uint32_t shader = CreateShader(shaderSources.VertexSource, shaderSources.FragmentSource);
-    glUseProgram(shader);
+    GLCall(glUseProgram(shader));
 
     int32_t location = glGetUniformLocation(shader, "u_Color");
     ASSERT(location != -1);
+
+    GLCall(glBindVertexArray(0));
+    GLCall(glUseProgram(0));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
     float redChanel = 0.0f;
     float increment = 0.05;
@@ -203,9 +216,14 @@ int main()
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
+        GLCall(glUseProgram(shader));
         GLCall(glUniform4f(location, redChanel, 0.3f, 0.8f, 0.1f));
+
+        GLCall(glBindVertexArray(vao));
+        GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr))
 
         if (redChanel > 1.0f)
@@ -222,7 +240,7 @@ int main()
         glfwPollEvents();
     }
 
-    glDeleteProgram(shader);
+    GLCall(glDeleteProgram(shader));
 
     glfwTerminate();
     return 0;
