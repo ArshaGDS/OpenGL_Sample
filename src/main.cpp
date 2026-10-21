@@ -186,7 +186,7 @@ int main()
     uint32_t bufferId;
     GLCall(glGenBuffers(1, &bufferId));
     GLCall(glBindBuffer(GL_ARRAY_BUFFER, bufferId));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(positions) * 2 * sizeof(float), positions, GL_STATIC_DRAW));
+    GLCall(glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW));
 
     GLCall(glEnableVertexAttribArray(0));
     GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr));
@@ -224,7 +224,7 @@ int main()
         GLCall(glBindVertexArray(vao));
         GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
 
-        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr))
+        GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         if (redChanel > 1.0f)
             increment = -0.05f;
