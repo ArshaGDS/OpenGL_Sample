@@ -17,10 +17,21 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR_BASE}/lib")
 
 add_subdirectory(dependencies)
 
-add_executable(OpenGL_Sample src/main.cpp)
+file(GLOB_RECURSE Render_Source CONFIGURE_DEPENDS
+        "src/*.cpp"
+        "src/*.h"
+)
 
-target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s)
+list(FILTER Render_Source EXCLUDE REGEX "src/main\\.cpp$")
+
+add_executable(OpenGL_Sample
+        src/main.cpp
+        ${Render_Source}
+)
 
 target_include_directories(OpenGL_Sample PRIVATE
+        "${PROJECT_SOURCE_DIR}/src"
         "${PROJECT_SOURCE_DIR}/dependencies/glew-2.3.1/include"
 )
+
+target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s)
