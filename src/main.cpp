@@ -12,6 +12,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 namespace fs = std::filesystem;
 
@@ -167,18 +168,21 @@ int main()
         GLCall(glGenVertexArrays(1, &vao));
         GLCall(glBindVertexArray(vao));
 
-        VertexBuffer vb(positions, sizeof(positions) * 2 * 4);
+        VertexArray vertexArray;
+        VertexBuffer vertexBuffer(positions, sizeof(positions) * 2 * 4);
+        vertexArray.Bind();
 
-        GLCall(glEnableVertexAttribArray(0));
-        GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr));
+        VertexBufferLayout layout;
+        layout.Push<float>(3);
+        vertexArray.AddBuffer(vertexBuffer, layout);
 
-        IndexBuffer ib(indices, sizeof(indices));
+        IndexBuffer indexBuffer(indices, sizeof(indices));
 
         const ShaderProgramSources shaderSources = ParseShader(FindResource("res/shaders/basic.shader"));
         const uint32_t shader = CreateShader(shaderSources.VertexSource, shaderSources.FragmentSource);
         GLCall(glUseProgram(shader));
 
-        int32_t location = glGetUniformLocation(shader, "u_Color");
+        const int32_t location = glGetUniformLocation(shader, "u_Color");
         ASSERT(location != -1);
 
         GLCall(glBindVertexArray(0));
@@ -198,8 +202,8 @@ int main()
             GLCall(glUseProgram(shader));
             GLCall(glUniform4f(location, redChanel, 0.3f, 0.8f, 0.1f));
 
-            GLCall(glBindVertexArray(vao));
-            ib.Bind();
+            vertexArray.Bind();
+            indexBuffer.Bind();
 
             GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
