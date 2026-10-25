@@ -168,15 +168,14 @@ int main()
         GLCall(glGenVertexArrays(1, &vao));
         GLCall(glBindVertexArray(vao));
 
-        VertexArray vertexArray;
-        VertexBuffer vertexBuffer(positions, sizeof(positions) * 2 * 4);
-        vertexArray.Bind();
-
+        const VertexArray vertexArray;
+        const VertexBuffer vertexBuffer(positions, sizeof(positions) * 2 * 4);
         VertexBufferLayout layout;
-        layout.Push<float>(3);
+
+        layout.Push<float>(2);
         vertexArray.AddBuffer(vertexBuffer, layout);
 
-        IndexBuffer indexBuffer(indices, sizeof(indices));
+        const IndexBuffer indexBuffer(indices, sizeof(indices));
 
         const ShaderProgramSources shaderSources = ParseShader(FindResource("res/shaders/basic.shader"));
         const uint32_t shader = CreateShader(shaderSources.VertexSource, shaderSources.FragmentSource);

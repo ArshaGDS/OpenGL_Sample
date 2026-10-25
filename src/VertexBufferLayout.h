@@ -16,21 +16,24 @@ struct VertexBufferElement
     {
         switch (type)
         {
-            case GL_FLOAT:          return  4;
-            case GL_UNSIGNED_INT:   return  4;
-            case GL_UNSIGNED_BYTE:  return  1;
-            default:                return  0;
+        case GL_FLOAT:         return 4;
+        case GL_UNSIGNED_INT:  return 4;
+        case GL_UNSIGNED_BYTE: return 1;
         }
+        ASSERT(false);
+        return 0;
     }
 };
 
 class VertexBufferLayout
 {
 public:
-    VertexBufferLayout() : m_Stride(0) {}
+    VertexBufferLayout() : m_Stride(0)
+    {
+    }
 
-    template<typename T>
-    void Push(uint32_t count)
+    template <typename T>
+    void Push(const uint32_t count)
     {
         uint32_t type = 0;
         uint8_t normalized = GL_FALSE;
@@ -53,7 +56,13 @@ public:
             static_assert(std::is_same_v<T, void>, "Unsupported vertex attribute type");
         }
 
-        m_Elements.push_back({type, count, normalized});
+        m_Elements.push_back(
+            {
+                .type = type,
+                .count = count,
+                .normalized = normalized
+            }
+        );
         m_Stride += count * VertexBufferElement::GetSizeOfType(type);
     }
 
