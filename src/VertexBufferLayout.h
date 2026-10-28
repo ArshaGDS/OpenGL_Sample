@@ -8,9 +8,9 @@
 
 struct VertexBufferElement
 {
-    uint32_t type;
-    uint32_t count;
-    uint8_t normalized;
+    uint32_t type{};
+    uint32_t count{};
+    uint8_t normalized{};
 
     static uint32_t GetSizeOfType(uint32_t type)
     {
@@ -28,10 +28,6 @@ struct VertexBufferElement
 class VertexBufferLayout
 {
 public:
-    VertexBufferLayout() : m_Stride(0)
-    {
-    }
-
     template <typename T>
     void Push(const uint32_t count)
     {
@@ -78,5 +74,5 @@ public:
 
 private:
     std::vector<VertexBufferElement> m_Elements;
-    uint32_t m_Stride;
+    uint32_t m_Stride{};
 };

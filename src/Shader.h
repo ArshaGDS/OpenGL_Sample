@@ -26,12 +26,13 @@ public:
     void Unbind() const;
 
     // Set uniform
+    void SetUniform1i(const std::string& name, int32_t value);
     void SetUniform1f(const std::string& name, float value);
     void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
 
 private:
-    uint32_t m_RendererID;
-    std::string m_FilePath;
+    uint32_t m_RendererID{};
+    std::string m_FilePath{};
     std::unordered_map<std::string, int32_t> m_UniformLocationCache;
 
 private:

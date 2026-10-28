@@ -10,7 +10,7 @@
 #include "Renderer.h"
 #include "GL/glew.h"
 
-Shader::Shader(const std::string& filepath): m_RendererID(0), m_FilePath(filepath)
+Shader::Shader(const std::string& filepath): m_FilePath(filepath)
 {
     const ShaderProgramSources shaderSources = ParseShader(File::FindResource(m_FilePath));
     m_RendererID = CreateShader(shaderSources.VertexSource, shaderSources.FragmentSource);
@@ -29,6 +29,11 @@ void Shader::Bind() const
 void Shader::Unbind() const
 {
     GLCall(glUseProgram(0));
+}
+
+void Shader::SetUniform1i(const std::string& name, int32_t value)
+{
+    GLCall( glUniform1i( GetUniformLocation(name), value) );
 }
 
 void Shader::SetUniform1f(const std::string& name, float value)

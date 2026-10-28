@@ -7,6 +7,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 
@@ -37,10 +38,10 @@ int main()
         return -1;
     {
         constexpr float positions[] = {
-            -0.5f, -0.5f,
-             0.5f, -0.5f,
-             0.5f, 0.5f,
-            -0.5f, 0.5f,
+            -0.5f, -0.5f, 0.0f, 0.0f,
+             0.5f, -0.5f, 1.0f, 0.0f,
+             0.5f, 0.5f, 1.0f, 1.0f,
+            -0.5f, 0.5f, 0.0f, 1.0f,
         };
 
         constexpr uint32_t indices[] = {
@@ -53,9 +54,10 @@ int main()
         GLCall(glBindVertexArray(vao));
 
         const VertexArray vertexArray;
-        const VertexBuffer vertexBuffer(positions, sizeof(positions) * 2 * 4);
+        const VertexBuffer vertexBuffer(positions, sizeof(positions) * 4 * 4);
         VertexBufferLayout layout;
 
+        layout.Push<float>(2);
         layout.Push<float>(2);
         vertexArray.AddBuffer(vertexBuffer, layout);
 
@@ -64,6 +66,10 @@ int main()
         Shader shader("res/shaders/basic.shader");
         shader.Bind();
         shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+
+        const Texture texture("res/textures/Roya_C_Logo.jpg");
+        texture.Bind();
+        shader.SetUniform1i("u_Texture", 0);
 
         vertexArray.Unbind();
         vertexBuffer.Unbind();

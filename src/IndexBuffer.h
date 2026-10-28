@@ -13,6 +13,6 @@ public:
     [[nodiscard]] uint32_t GetCount() const { return m_Count; }
 
 private:
-    uint32_t m_RenderId;
-    uint32_t m_Count;
+    uint32_t m_RenderId{};
+    uint32_t m_Count{};
 };
