@@ -9,6 +9,7 @@
 #include "File.h"
 #include "Renderer.h"
 #include "GL/glew.h"
+#include "gtc/type_ptr.hpp"
 
 Shader::Shader(const std::string& filepath): m_FilePath(filepath)
 {
@@ -44,6 +45,11 @@ void Shader::SetUniform1f(const std::string& name, float value)
 void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
     GLCall( glUniform4f( GetUniformLocation(name), v0, v1, v2, v3 ) );
+}
+
+void Shader::SetUniformMat4(const std::string& name, const glm::mat4& matrix)
+{
+    glUniformMatrix4fv( static_cast<int32_t>(GetUniformLocation(name)), 1, GL_FALSE, glm::value_ptr(matrix) );
 }
 
 uint32_t Shader::GetUniformLocation(const std::string& name)

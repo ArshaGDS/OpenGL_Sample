@@ -36,4 +36,4 @@ target_include_directories(OpenGL_Sample PRIVATE
         "${PROJECT_SOURCE_DIR}/dependencies/stb_image"
 )
 
-target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s stb_image)
+target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s stb_image glm)

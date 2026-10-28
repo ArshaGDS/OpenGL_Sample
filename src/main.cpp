@@ -11,6 +11,9 @@
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 
+#include <glm.hpp>
+#include "glm/gtc/matrix_transform.hpp"
+
 int main()
 {
     /* Initialize the library */
@@ -66,9 +69,12 @@ int main()
 
         const IndexBuffer indexBuffer(indices, sizeof(indices));
 
+        const glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f,-1.0f, 1.0f);
+
         Shader shader("res/shaders/basic.shader");
         shader.Bind();
         shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
+        shader.SetUniformMat4("u_MVP", proj);
 
         const Texture texture("res/textures/Roya_Logo.jpg");
         texture.Bind();
