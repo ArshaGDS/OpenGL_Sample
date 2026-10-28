@@ -1,4 +1,7 @@
 #pragma once
+#include "IndexBuffer.h"
+#include "Shader.h"
+#include "VertexArray.h"
 
 #if defined(_MSC_VER)
     // MSVC (Windows)
@@ -33,3 +36,11 @@
 
 void GLClearError();
 bool GLLogCall(const char* function, const char* file, int line);
+
+class Renderer
+{
+public:
+    void Clear();
+    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader);
+
+};

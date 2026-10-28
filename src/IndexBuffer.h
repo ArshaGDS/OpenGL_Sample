@@ -4,13 +4,13 @@
 class IndexBuffer
 {
 public:
-    IndexBuffer(const uint32_t* data, const int32_t count);
+    IndexBuffer(const uint32_t* data, int32_t count);
     ~IndexBuffer();
 
     void Bind() const;
     void Unbind() const;
 
-    uint32_t GetCount() const { return m_Count; }
+    [[nodiscard]] uint32_t GetCount() const { return m_Count; }
 
 private:
     uint32_t m_RenderId;
