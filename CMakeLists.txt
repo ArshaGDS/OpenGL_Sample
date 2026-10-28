@@ -32,6 +32,8 @@ add_executable(OpenGL_Sample
 target_include_directories(OpenGL_Sample PRIVATE
         "${PROJECT_SOURCE_DIR}/src"
         "${PROJECT_SOURCE_DIR}/dependencies/glew-2.3.1/include"
+        "${PROJECT_SOURCE_DIR}/dependencies/glm/glm"
+        "${PROJECT_SOURCE_DIR}/dependencies/stb_image"
 )
 
-target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s)
+target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s stb_image)

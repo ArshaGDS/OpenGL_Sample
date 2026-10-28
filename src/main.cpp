@@ -49,12 +49,15 @@ int main()
             2, 3, 0
         };
 
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
         uint32_t vao; // vertex array object
         GLCall(glGenVertexArrays(1, &vao));
         GLCall(glBindVertexArray(vao));
 
         const VertexArray vertexArray;
-        const VertexBuffer vertexBuffer(positions, sizeof(positions) * 4 * 4);
+        const VertexBuffer vertexBuffer(positions, sizeof(positions));
         VertexBufferLayout layout;
 
         layout.Push<float>(2);
@@ -67,7 +70,7 @@ int main()
         shader.Bind();
         shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
 
-        const Texture texture("res/textures/Roya_C_Logo.jpg");
+        const Texture texture("res/textures/Roya_Logo.jpg");
         texture.Bind();
         shader.SetUniform1i("u_Texture", 0);
 

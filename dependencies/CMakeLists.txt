@@ -7,3 +7,5 @@ set(BUILD_UTILS OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(glfw-3.5.1)
 add_subdirectory(glew-2.3.1/build/cmake)
+add_subdirectory(glm)
+add_subdirectory(stb_image)
