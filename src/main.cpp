@@ -39,6 +39,8 @@ int main()
 
     if (glewInit() != GLEW_OK)
         return -1;
+
+
     {
         constexpr float positions[] = {
             -0.5f, -0.5f, 0.0f, 0.0f,
@@ -69,11 +71,10 @@ int main()
 
         const IndexBuffer indexBuffer(indices, sizeof(indices));
 
-        const glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f,-1.0f, 1.0f);
+        const glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -0.75f, 0.75f,-1.0f, 1.0f);
 
         Shader shader("res/shaders/basic.shader");
         shader.Bind();
-        shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
         shader.SetUniformMat4("u_MVP", proj);
 
         const Texture texture("res/textures/Roya_Logo.jpg");
@@ -85,27 +86,13 @@ int main()
         indexBuffer.Unbind();
         shader.Unbind();
 
-        float redChanel = 0.0f;
-        float increment = 0.05;
-
         Renderer renderer;
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
             renderer.Clear();
-
-            shader.Bind();
-            shader.SetUniform4f("u_Color", redChanel, 0.3f, 0.8f, 0.1f);
-
             renderer.Draw(vertexArray, indexBuffer, shader);
-
-            if (redChanel > 1.0f)
-                increment = -0.05f;
-            else if (redChanel < 0.0f)
-                increment = 0.05f;
-
-            redChanel += increment;
 
             /* Swap front and back buffers */
             glfwSwapBuffers(window);
