@@ -34,6 +34,7 @@ target_include_directories(OpenGL_Sample PRIVATE
         "${PROJECT_SOURCE_DIR}/dependencies/glew-2.3.1/include"
         "${PROJECT_SOURCE_DIR}/dependencies/glm/glm"
         "${PROJECT_SOURCE_DIR}/dependencies/stb_image"
+        "${PROJECT_SOURCE_DIR}/dependencies/imgui-1_93_0"
 )
 
-target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s stb_image glm)
+target_link_libraries(OpenGL_Sample PRIVATE glfw OpenGL::GL glew_s stb_image glm ImGui::ImGui)
