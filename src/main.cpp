@@ -51,10 +51,10 @@ int main()
 
     {
         constexpr float positions[] = {
-            100.0f, 100.0f, 0.0f, 0.0f,
-            200.0f, 100.0f, 1.0f, 0.0f,
-            200.0f, 200.0f, 1.0f, 1.0f,
-            100.0f, 200.0f, 0.0f, 1.0f,
+            -50.0f, -50.0f, 0.0f, 0.0f,
+             50.0f, -50.0f, 1.0f, 0.0f,
+             50.0f,  50.0f, 1.0f, 1.0f,
+            -50.0f,  50.0f, 0.0f, 1.0f,
         };
 
         constexpr uint32_t indices[] = {
@@ -80,7 +80,7 @@ int main()
         const IndexBuffer indexBuffer(indices, sizeof(indices));
 
         const glm::mat4 proj = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f,-1.0f, 1.0f);
-        constexpr glm::mat4 view = glm::translate(glm::mat4( 1.0f), glm::vec3(-100.0f, 0.0f, 0.0f));
+        constexpr glm::mat4 view = glm::translate(glm::mat4( 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 
         Shader shader("res/shaders/basic.shader");
@@ -109,7 +109,8 @@ int main()
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 330");
 
-        glm::vec3 translation(200.0f, 200.0f, 0.0f);
+        glm::vec3 translationA(200.0f, 200.0f, 0.0f);
+        glm::vec3 translationB(400.0f, 200.0f, 0.0f);
         static float f = 0.0f;
 
         /* Loop until the user closes the window */
@@ -122,17 +123,31 @@ int main()
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            glm::mat4 model = glm::translate(glm::mat4( 1.0f), translation);
-            const glm::mat4 mvp = proj * view * model;
-            shader.Bind();
-            shader.SetUniformMat4("u_MVP", mvp);
+            // First object
+            {
+                glm::mat4 model = glm::translate(glm::mat4( 1.0f), translationA);
+                const glm::mat4 mvp = proj * view * model;
+                shader.Bind();
+                shader.SetUniformMat4("u_MVP", mvp);
 
-            renderer.Draw(vertexArray, indexBuffer, shader);
+                renderer.Draw(vertexArray, indexBuffer, shader);
+            }
+
+            // Second object
+            {
+                glm::mat4 model = glm::translate(glm::mat4( 1.0f), translationB);
+                const glm::mat4 mvp = proj * view * model;
+                shader.Bind();
+                shader.SetUniformMat4("u_MVP", mvp);
+
+                renderer.Draw(vertexArray, indexBuffer, shader);
+            }
 
             {
                 ImGui::Begin("Debug panel");
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-                ImGui::SliderFloat2("Translation", &translation.x, 0.0f, 960.0f);
+                ImGui::SliderFloat2("Translation A", &translationA.x, 0.0f, 960.0f);
+                ImGui::SliderFloat2("Translation B", &translationB.x, 0.0f, 960.0f);
                 ImGui::End();
             }
 
